@@ -1,0 +1,92 @@
+@page "/Administrator"
+
+@using BlazorInputFile
+@using System.IO
+@using CsvHelper
+@using System.Globalization
+
+
+<h1>Questions editor</h1>
+
+<div class="drag-drop-zone">
+    <InputFile OnChange="ViewFile" />
+    @status
+</div>
+
+@if (fileName != null)
+{
+    <h3>@fileName</h3>
+
+    <p>@fileTextContents</p>
+    <p>@records.Count</p>
+
+        @foreach(var f in records){
+            <p> @f.QuestionID, @f.QuestionText, @f.Answer1, @f.Answer2, @f.Answer3, @f.Solution </p>
+        }
+
+}
+
+@code {
+    const string DefaultStatus = "Drop a text file here to view it, or click to choose a file";
+    const int MaxFileSize = 5 * 1024 * 1024; // 5MB
+    string status = DefaultStatus;
+
+    string fileName;
+    string fileTextContents;
+
+    List<Foo> records = new List<Foo>();
+
+    public class Foo {
+        public string QuestionID { get; set; }
+        public string QuestionText { get; set; }
+        public string Answer1 { get; set; }
+        public string Answer2 { get; set; }
+        public string Answer3 { get; set; }
+        public string Solution { get; set; }
+    }
+
+    async Task ViewFile(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+        if (file == null)
+        {
+            return;
+        }
+        else if (file.Size > MaxFileSize)
+        {
+            status = $"That's too big. Max size: {MaxFileSize} bytes.";
+        }
+        else
+        {
+            status = "Loading...";
+
+            fileName = file.Name;
+
+            using(var reader = new StreamReader(file.Data))
+            {
+                               
+                fileTextContents = await reader.ReadToEndAsync();
+                var lines = fileTextContents.Split("\r\n");
+
+                foreach(var l in lines)
+                {
+                    if(!String.IsNullOrEmpty(l)){
+                        var temp = l.Split(",");
+
+                        var foo1 = new Foo();
+                        foo1.QuestionID = temp[0];
+                        foo1.QuestionText = temp[1];
+                        foo1.Answer1 = temp[2];
+                        foo1.Answer2 = temp[3];
+                        foo1.Answer3 = temp[4];
+                        foo1.Solution = temp[5];
+                        records.Add(foo1);
+                    }
+
+                }
+            
+                status = DefaultStatus;
+            }
+        }
+    }
+}
