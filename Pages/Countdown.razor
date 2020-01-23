@@ -1,0 +1,77 @@
+@page "/CountDown"
+@using System.Timers
+
+<h3>Count Down</h3>
+ 
+    @if(task != 4){
+        <p> Task: @task </p>
+        <p> Game in progress </p>
+        <p>
+            Timer: @time 
+            @if(time == 0){
+                <p>Time elapsed!!</p>
+            }
+        </p>
+        <p> Question: @question </p>
+    } 
+    else{
+        <p> Game completed!! </p>
+    }
+
+
+
+@code {
+    [Parameter]
+    public RenderFragment TaskComponent { get; set; }
+    int task = 0;
+    int time = 0;
+
+    string question = "";
+    
+    List<string> listQ;
+
+    Timer aTimer;
+
+    protected override void OnInitialized()
+    {  
+        task = 1;
+        listQ = new List<string>() { "q1", "q2", "q3" };
+        SetGame();
+    }
+
+    void SetGame(){
+
+        //TODO: read the question somewhere and display it
+            time = 5;
+            question = task != 4 ? listQ[task-1] : "";
+            SetTimer();
+    }
+
+    void SetTimer()
+    {
+        // Create a timer with a one second interval.
+        aTimer = new System.Timers.Timer(1000);
+        // Hook up the Elapsed event for the timer. 
+        aTimer.Elapsed += OnTimedEvent;
+        aTimer.AutoReset = true;
+        aTimer.Enabled = true;
+    }
+
+    void OnTimedEvent(Object source, ElapsedEventArgs e)
+    {
+        if(time > 0)
+        {
+            time--;       
+        }
+        else
+        {
+            if(task < 4){
+                task++;
+                aTimer.Dispose();
+                SetGame();
+            }            
+        }
+
+        StateHasChanged();
+    }
+}

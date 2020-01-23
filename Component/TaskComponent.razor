@@ -1,0 +1,16 @@
+@page "/TaskComponent"
+
+<div class="panel panel-default">
+    <div class="panel-body">@TaskContent</div>
+
+    <p>Status: @Status</p>
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment TaskContent { get; set; }
+
+    [Parameter]
+    public string Status { get; set; }
+}
