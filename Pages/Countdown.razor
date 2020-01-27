@@ -2,29 +2,66 @@
 @using System.Timers
 
 <h3>Count Down</h3>
- 
-    @if(task != 4){
-        <p> Task: @task </p>
-        <p> Game in progress </p>
-        <p>
-            Timer: @time 
-            @if(time == 0){
-                <p>Time elapsed!!</p>
-            }
-        </p>
-        <p> Question: @question </p>
-    } 
-    else{
-        <p> Game completed!! </p>
-    }
 
 
+
+@if(task != 4){
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-primary" role="alert" style="margin-bottom: 0">
+                    Task: @task
+                </div>  
+                <div class="progress" style="margin-bottom: 5px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@valuebar" aria-valuemin="0" aria-valuemax="100" style="width: @valuebar%;"></div>
+                </div>              
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <p style="display: block">
+                    Question: @question per fare la prova di una domanda un po' più lunga rispetto alle altre per capire come va a capo e come si presenta nella UI - mi serve che sia ancora più òlunga se no non posso capire bene come funziona il layout di questo sito web in ogni caso possibile
+                </p>              
+            </div>
+            <div class="col">
+                @if(time > 0){
+                    <div class="alert alert-secondary" role="alert" style="display: block">
+                        Timer: @time
+                    </div>
+                }
+                else{
+                    <div class="alert alert-danger" role="alert">Time elapsed!!</div>
+                }
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-outline-primary btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer1</button>
+            <button type="button" class="btn btn-outline-success btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer2</button>
+            <button type="button" class="btn btn-outline-danger btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer3</button>
+            </div>
+        </div>
+    </div>
+} 
+else{
+    <div class="container">
+        <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
+            Game Completed!
+        </div>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
+        </div>
+    </div>
+}
 
 @code {
     [Parameter]
     public RenderFragment TaskComponent { get; set; }
     int task = 0;
     int time = 0;
+
+    int valuebar = 50;
 
     string question = "";
     
