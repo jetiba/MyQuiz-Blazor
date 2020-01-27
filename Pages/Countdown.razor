@@ -3,84 +3,110 @@
 
 <h3>Count Down</h3>
 
-
-
-@if(task != 4){
     <div class="container">
         <div class="row">
             <div class="col">
-                <div class="alert alert-primary" role="alert" style="margin-bottom: 0">
-                    Task: @task
-                </div>  
+                @if(task != 4){
+                    <div class="alert alert-primary" role="alert" style="margin-bottom: 0">
+                            Task: @task
+                    </div>  
+                }
+                else {
+                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
+                        Game Completed!
+                    </div>
+                }
                 <div class="progress" style="margin-bottom: 5px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@valuebar" aria-valuemin="0" aria-valuemax="100" style="width: @valuebar%;"></div>
                 </div>              
             </div>
         </div>
+    </div>
 
-        <div class="row">
-            <div class="col">
-                <p style="display: block">
-                    Question: @question per fare la prova di una domanda un po' più lunga rispetto alle altre per capire come va a capo e come si presenta nella UI - mi serve che sia ancora più òlunga se no non posso capire bene come funziona il layout di questo sito web in ogni caso possibile
-                </p>              
+    @if(task != 4){
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <p style="display: block">
+                        Question: @question per fare la prova di una domanda un po' più lunga rispetto alle altre per capire come va a capo e come si presenta nella UI - mi serve che sia ancora più òlunga se no non posso capire bene come funziona il layout di questo sito web in ogni caso possibile
+                    </p>              
+                </div>
+                <div class="col">
+                    @if(time > 0){
+                        <div class="alert alert-secondary" role="alert" style="display: block">
+                            Timer: @time
+                        </div>
+                    }
+                    else{
+                        if(String.IsNullOrEmpty(result)){
+                            <div class="alert alert-danger" role="alert">Time elapsed!!</div>
+                        }
+                        else if(result == "CORRECT"){
+                            <div class="alert alert-success" role="alert">CORRECT</div>
+                        }
+                        else{
+                            <div class="alert alert-danger" role="alert">INCORRECT</div>
+                        } 
+                    }     
+                </div>
             </div>
-            <div class="col">
-                @if(time > 0){
-                    <div class="alert alert-secondary" role="alert" style="display: block">
-                        Timer: @time
-                    </div>
+            <div class="row">
+                <div class="col">
+                @foreach(var a in listA){
+                    <button type="button" class="btn btn-outline-primary btn-lg btn-block" @onclick="@(e => CheckAnswer(e, a.Key))" style="display: block; margin-bottom: 5px;">@a.Value</button>
                 }
-                else{
-                    <div class="alert alert-danger" role="alert">Time elapsed!!</div>
-                }
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <button type="button" class="btn btn-outline-primary btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer1</button>
-            <button type="button" class="btn btn-outline-success btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer2</button>
-            <button type="button" class="btn btn-outline-danger btn-lg btn-block" style="display: block; margin-bottom: 5px;">Answer3</button>
-            </div>
-        </div>
-    </div>
-} 
-else{
-    <div class="container">
-        <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
-            Game Completed!
-        </div>
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;"></div>
-        </div>
-    </div>
-}
+    }
 
 @code {
     [Parameter]
     public RenderFragment TaskComponent { get; set; }
     int task = 0;
     int time = 0;
-
-    int valuebar = 50;
-
-    string question = "";
-    
+    int valuebar = 0;
+    string question = ""; 
     List<string> listQ;
 
+    Dictionary<int,string> listA = new Dictionary<int, string>();
     Timer aTimer;
+    string result = "";
 
     protected override void OnInitialized()
     {  
         task = 1;
         listQ = new List<string>() { "q1", "q2", "q3" };
+        @* to change with the check in the DB *@
+        listA.Add(1, "answer1");
+        listA.Add(2, "answer2");
+        listA.Add(3, "answer3");
+        @*  *@
         SetGame();
+    }
+
+    void CheckAnswer(MouseEventArgs e, int answer){
+        aTimer.Stop();
+
+        @* logic to check answer (or REST API request) *@
+        if(answer == 1){
+            result = "CORRECT";
+        }else{
+            result = "INCORRECT";
+        }
+        @* think a logic to restart the timer better than this one *@
+        time = 0;
+
+        StateHasChanged();
+        aTimer.Start();
     }
 
     void SetGame(){
 
         //TODO: read the question somewhere and display it
-            time = 5;
+            time = 10;
             question = task != 4 ? listQ[task-1] : "";
+            result = "";
             SetTimer();
     }
 
@@ -104,9 +130,13 @@ else{
         {
             if(task < 4){
                 task++;
+                valuebar = valuebar + 33;
                 aTimer.Dispose();
                 SetGame();
-            }            
+            }     
+            if(task == 4){
+                valuebar = 100;
+            }      
         }
 
         StateHasChanged();
