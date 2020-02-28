@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Blazor.Hosting;
 
-namespace quiztestbl
+namespace quiz.client
 {
     public class Program
     {

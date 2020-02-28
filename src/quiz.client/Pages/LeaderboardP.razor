@@ -1,0 +1,18 @@
+@page "/Leaderboard"
+@inject ILeaderboardService LeaderboardService
+
+<h3> Leaderboard </h3>
+
+@foreach (var user in listUsers)
+{
+    <p>@user.Username - @user.Points</p>
+}
+
+@code {
+    List<Leaderboard> listUsers = new List<Leaderboard>();
+
+     protected override async Task OnInitializedAsync()
+    {  
+        listUsers = await LeaderboardService.GetAllPoints();
+    }
+}

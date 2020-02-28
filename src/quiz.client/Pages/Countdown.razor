@@ -1,7 +1,9 @@
 @page "/CountDown"
 @using System.Timers
+@inject ILeaderboardService LeaderboardService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
-<h3>Count Down</h3>
+<h3>Quiz Game</h3>
 
     <div class="container">
         <div class="row">
@@ -12,9 +14,14 @@
                     </div>  
                 }
                 else {
+                    <a class="btn btn-primary" href="leaderboard" role="button">Vedi la classifica !</a>
                     <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
-                        Game Completed!
+                        Gioco completato!
                     </div>
+                    <div class="alert alert-secondary" role="alert" style="margin-bottom: 0">
+                        Hai totalizzato @points punti
+                    </div>
+                    
                 }
                 <div class="progress" style="margin-bottom: 5px;">
                     <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@valuebar" aria-valuemin="0" aria-valuemax="100" style="width: @valuebar%;"></div>
@@ -35,6 +42,9 @@
                     @if(time > 0){
                         <div class="alert alert-secondary" role="alert" style="display: block">
                             Timer: @time
+                        </div>
+                        <div class="alert alert-secondary" role="alert" style="display: block">
+                            Point: @points
                         </div>
                     }
                     else{
@@ -66,6 +76,7 @@
     int task = 0;
     int time = 0;
     int valuebar = 0;
+    int points = 0;
     string question = ""; 
     List<string> listQ;
 
@@ -73,8 +84,12 @@
     Timer aTimer;
     string result = "";
 
-    protected override void OnInitialized()
+    string username = "";
+
+    protected override async Task OnInitializedAsync()
     {  
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        username = authState.User.Identity.Name;
         task = 1;
         listQ = new List<string>() { "q1", "q2", "q3" };
         @* to change with the check in the DB *@
@@ -90,6 +105,7 @@
 
         @* logic to check answer (or REST API request) *@
         if(answer == 1){
+            points++;
             result = "CORRECT";
         }else{
             result = "INCORRECT";
@@ -136,6 +152,12 @@
             }     
             if(task == 4){
                 valuebar = 100;
+                //update points in db
+                LeaderboardService.AddPoints(new Leaderboard(){
+                    Username = username,
+                    Points = points
+                });
+                aTimer.Stop();
             }      
         }
 

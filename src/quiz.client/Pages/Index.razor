@@ -1,0 +1,15 @@
+﻿@page "/"
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<AuthorizeView>
+    <Authorized>
+         <p> Welcome @context.User.Identity.Name </p>
+         <a class="btn btn-primary" href="countdown" role="button">Start quiz !</a>
+    </Authorized>
+   <NotAuthorized>
+       <p> Your are not logged in, please register or login first </p>
+   </NotAuthorized>
+</AuthorizeView>
