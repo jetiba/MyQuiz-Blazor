@@ -10,7 +10,7 @@ using quiz.shared;
 namespace quiz.server.Controllers
 {
     [Route("api/[controller]")]
-    // [Authorize]
+    [Authorize]
     public class LeaderboardController : Controller
     {
         private readonly LeaderboardDbContext ldbcontext;
@@ -45,7 +45,7 @@ namespace quiz.server.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> AddPoints([FromBody]Leaderboard leaderboard)
         {
-            // if(string.Equals(User.Identity.Name, leaderboard.Username))
+            if(string.Equals(User.Identity.Name, leaderboard.Username))
             {
                 var old = await ldbcontext.Leaderboards.FindAsync(leaderboard.Username);
                 if(old == default)
@@ -62,7 +62,7 @@ namespace quiz.server.Controllers
                 return new OkResult();
             }
             
-            // return new UnauthorizedResult();
+            return new UnauthorizedResult();
         }
     }
 }
