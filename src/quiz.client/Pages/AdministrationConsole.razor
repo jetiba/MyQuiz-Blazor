@@ -1,0 +1,12 @@
+@page "/Administration"
+
+<AuthorizeView>
+    <Authorized>
+         <p> Pannello di gestione Quiz </p>
+         <a class="btn btn-primary" href="upload" role="button">Carica nuove domande</a>
+         <a class="btn btn-primary" href="manage" role="button">Gestisci il quiz</a>
+    </Authorized>
+   <NotAuthorized>
+       <p> Questi contenuti sono disponibili solo per gli amministratori del quiz </p>
+   </NotAuthorized>
+</AuthorizeView>

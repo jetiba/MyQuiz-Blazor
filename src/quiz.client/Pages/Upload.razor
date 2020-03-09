@@ -1,0 +1,107 @@
+@page "/Upload"
+
+@using BlazorInputFile
+@using System.IO
+@using CsvHelper
+@using System.Globalization
+@using System.Text
+
+@inject IQuestionService QuestionService
+
+<AuthorizeView>
+    <Authorized> 
+    
+        <h1>Questions editor</h1>
+
+        <div class="drag-drop-zone">
+            <InputFile OnChange="ViewFile" />
+            @status
+        </div>
+
+        @if (fileName != null)
+        {
+            <h3>@fileName</h3>
+
+            <p>Sono state caricate @records.Count domande</p>
+            <p> Controlla le domande prima di procedere all'avvio del quiz </p>
+
+            @* TODO: tabular format of the questions list *@
+                @foreach(var f in records){
+                    <p> @f.QuestionID, @f.QuestionText, @f.Answer1, @f.Answer2, @f.Answer3, @f.Solution </p>
+                }
+        }
+
+</Authorized>
+   <NotAuthorized>
+       <p> Questi contenuti sono disponibili solo per gli amministratori del quiz </p>
+   </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    const string DefaultStatus = "Drop a text file here to view it, or click to choose a file";
+    const int MaxFileSize = 5 * 1024 * 1024; // 5MB
+    string status = DefaultStatus;
+
+    string fileName;
+
+    bool updated = false;
+
+    List<Question> records = new List<Question>();
+
+    @* public class Foo {
+        public string QuestionID { get; set; }
+        public string QuestionText { get; set; }
+        public string Answer1 { get; set; }
+        public string Answer2 { get; set; }
+        public string Answer3 { get; set; }
+        public string Solution { get; set; }
+    } *@
+
+    async Task ViewFile(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+        if (file == null)
+        {
+            return;
+        }
+        else if (file.Size > MaxFileSize)
+        {
+            status = $"That's too big. Max size: {MaxFileSize} bytes.";
+        }
+        else
+        {
+            status = "Loading...";
+
+            fileName = file.Name;
+
+            using (var stream = new MemoryStream())
+            {
+                await file.Data.CopyToAsync(stream);
+                stream.Seek(0, SeekOrigin.Begin);
+                var reader = new System.IO.StreamReader(stream, Encoding.UTF7);
+                using (var csv = new CsvReader(reader, CultureInfo.CurrentUICulture))
+                {
+                    csv.Read();
+                    csv.ReadHeader();
+                    while (csv.Read())
+                    {
+                        var record = new Question
+                        {
+                            QuestionID = Guid.NewGuid(),
+                            QuestionText = csv.GetField("QuestionText"),
+                            Answer1 = csv.GetField("Answer1"),
+                            Answer2 = csv.GetField("Answer2"),
+                            Answer3 = csv.GetField("Answer3"),
+                            Solution = csv.GetField("Solution")
+                        };
+                        records.Add(record);
+                    }
+                    //records = csv.GetRecords<Question>().ToList();
+                    updated = await QuestionService.AddQuestions(records);
+
+                    status = updated ? "Succeded" : "Failed";
+                }
+            }
+        }
+    }
+}

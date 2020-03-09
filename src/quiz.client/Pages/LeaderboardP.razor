@@ -3,12 +3,34 @@
 
 <h3> Leaderboard </h3>
 
-@foreach (var user in listUsers)
-{
-    <p>@user.Username - @user.Points</p>
-}
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Nickname</th>
+                <th scope="col">Punti</th>
+                <th scope="col">Partite giocate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in listUsers)
+            {
+                i++;
+                <tr>
+                    <th scope="row">@i</th>
+                    <td>@user.Username</td>
+                    <td>@user.Points</td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
+
+    int i = 0;
     List<Leaderboard> listUsers = new List<Leaderboard>();
 
      protected override async Task OnInitializedAsync()

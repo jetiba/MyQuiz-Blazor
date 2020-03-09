@@ -13,9 +13,9 @@ namespace quiz.server.Controllers
     [Authorize]
     public class LeaderboardController : Controller
     {
-        private readonly LeaderboardDbContext ldbcontext;
+        private readonly QuizDbContext ldbcontext;
 
-        public LeaderboardController(LeaderboardDbContext ldbcontext)
+        public LeaderboardController(QuizDbContext ldbcontext)
         {
             this.ldbcontext = ldbcontext;
         }

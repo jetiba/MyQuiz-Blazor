@@ -1,15 +1,31 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<div class="container page-centered">
+    <div class="row">
+        <div class="col">
+            <h1>Benvenuto!</h1>
+            <p> descrizione del gioco, da capire bene cosa scrivere </p>
+        </div>  
+    </div>
+    <AuthorizeView>
+        <Authorized>
+            <div class="row">
+                <div class="col">
+                    <a class="btn btn-primary" href="countdown" role="button">Inizia il quiz!</a>
+                </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="row">
+                <div class="col">
+                    <h5>Per iniziare a giocare esegui il Login oppure registrati come nuovo utente</h5>
+                    <a class="btn btn-primary" href="login" role="button">Login</a>
+                    <a class="btn btn-primary" href="register" role="button">Registrati</a>
 
-Welcome to your new app.
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
 
-<AuthorizeView>
-    <Authorized>
-         <p> Welcome @context.User.Identity.Name </p>
-         <a class="btn btn-primary" href="countdown" role="button">Start quiz !</a>
-    </Authorized>
-   <NotAuthorized>
-       <p> Your are not logged in, please register or login first </p>
-   </NotAuthorized>
-</AuthorizeView>
+</div>
+

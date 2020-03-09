@@ -2,83 +2,84 @@
 @using System.Timers
 @inject ILeaderboardService LeaderboardService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IQuestionService QuestionService
 
-<h3>Quiz Game</h3>
 
-    <div class="container">
+    <div class="container page-centered">
+
         <div class="row">
-            <div class="col">
-                @if(task != 4){
-                    <div class="alert alert-primary" role="alert" style="margin-bottom: 0">
-                            Task: @task
-                    </div>  
-                }
-                else {
-                    <a class="btn btn-primary" href="leaderboard" role="button">Vedi la classifica !</a>
-                    <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
-                        Gioco completato!
-                    </div>
-                    <div class="alert alert-secondary" role="alert" style="margin-bottom: 0">
-                        Hai totalizzato @points punti
-                    </div>
-                    
-                }
-                <div class="progress" style="margin-bottom: 5px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="@valuebar" aria-valuemin="0" aria-valuemax="100" style="width: @valuebar%;"></div>
-                </div>              
-            </div>
+            @if(task != listFoo.Count){
+                <div class="col rounded-borders">
+                        Domanda: @task
+                </div>
+                <div class="col-3 rounded-borders">                      
+                        Punti: @points
+                </div>
+            }
+            else {
+                <a class="btn btn-primary" href="leaderboard" role="button">Vedi la classifica !</a>
+                <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
+                    Gioco completato!
+                </div>
+                <div class="alert alert-secondary" role="alert" style="margin-bottom: 0">
+                    Hai totalizzato @points punti
+                </div>                 
+            }
         </div>
     </div>
 
-    @if(task != 4){
+
+    @if(task != listFoo.Count){
         <div class="container">
             <div class="row">
-                <div class="col">
-                    <p style="display: block">
-                        Question: @question per fare la prova di una domanda un po' più lunga rispetto alle altre per capire come va a capo e come si presenta nella UI - mi serve che sia ancora più òlunga se no non posso capire bene come funziona il layout di questo sito web in ogni caso possibile
-                    </p>              
+                <div class="col rounded-borders-full">
+                        @question              
                 </div>
-                <div class="col">
-                    @if(time > 0){
-                        <div class="alert alert-secondary" role="alert" style="display: block">
-                            Timer: @time
-                        </div>
-                        <div class="alert alert-secondary" role="alert" style="display: block">
-                            Point: @points
-                        </div>
-                    }
-                    else{
-                        if(String.IsNullOrEmpty(result)){
-                            <div class="alert alert-danger" role="alert">Time elapsed!!</div>
-                        }
-                        else if(result == "CORRECT"){
-                            <div class="alert alert-success" role="alert">CORRECT</div>
-                        }
-                        else{
-                            <div class="alert alert-danger" role="alert">INCORRECT</div>
-                        } 
-                    }     
-                </div>
+                @if(QuestionService.GetTime() > 0){
+                    <div class="col-3 rounded-borders-timer">                      
+                            @QuestionService.GetTime()
+                    </div>
+                }
+                else if(!disable)
+                {
+                    <div class="col rounded-borders-alert">Tempo Scaduto!!</div>
+                }
+                 
             </div>
+        </div>
             <div class="row">
                 <div class="col">
                 @foreach(var a in listA){
-                    <button type="button" class="btn btn-outline-primary btn-lg btn-block" @onclick="@(e => CheckAnswer(e, a.Key))" style="display: block; margin-bottom: 5px;">@a.Value</button>
+                    <button type="button" 
+                            class="btn btn-outline-primary btn-lg btn-block" 
+                            disabled="@disable"
+                            @onclick="@(e => CheckAnswer(e, a.Key))" style="display: block; margin-bottom: 5px;">@a.Value</button>
                 }
                 </div>
             </div>
-        </div>
+            <div class="row">
+                @if(result == "CORRECT"){
+                    <div class="col rounded-borders-success">CORRECT</div>
+                }
+                else if(result == "INCORRECT"){
+                    <div class="col rounded-borders-alert">INCORRECT</div>
+                }  
+            </div>
+             
     }
 
 @code {
     [Parameter]
     public RenderFragment TaskComponent { get; set; }
     int task = 0;
-    int time = 0;
+    @* int time = 0; *@
     int valuebar = 0;
     int points = 0;
     string question = ""; 
     List<string> listQ;
+    List<Question> listFoo = new List<Question>();
+
+    bool disable = false;
 
     Dictionary<int,string> listA = new Dictionary<int, string>();
     Timer aTimer;
@@ -86,78 +87,66 @@
 
     string username = "";
 
+    string solution = "";
+
     protected override async Task OnInitializedAsync()
     {  
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         username = authState.User.Identity.Name;
-        task = 1;
-        listQ = new List<string>() { "q1", "q2", "q3" };
-        @* to change with the check in the DB *@
-        listA.Add(1, "answer1");
-        listA.Add(2, "answer2");
-        listA.Add(3, "answer3");
-        @*  *@
+        aTimer = await QuestionService.GetTimer();
+        aTimer.Elapsed += OnTimedEvent;
+        
+        listFoo = await QuestionService.GetQuestions();
+        
         SetGame();
     }
 
-    void CheckAnswer(MouseEventArgs e, int answer){
-        aTimer.Stop();
-
-        @* logic to check answer (or REST API request) *@
-        if(answer == 1){
+    void CheckAnswer(MouseEventArgs e, int answer)
+    {
+        disable = true;
+        if(answer.ToString() == solution){
+            //TODO => check if already answer
             points++;
             result = "CORRECT";
         }else{
             result = "INCORRECT";
         }
-        @* think a logic to restart the timer better than this one *@
-        time = 0;
 
         StateHasChanged();
-        aTimer.Start();
     }
 
     void SetGame(){
 
-        //TODO: read the question somewhere and display it
-            time = 10;
-            question = task != 4 ? listQ[task-1] : "";
-            result = "";
-            SetTimer();
-    }
-
-    void SetTimer()
-    {
-        // Create a timer with a one second interval.
-        aTimer = new System.Timers.Timer(1000);
-        // Hook up the Elapsed event for the timer. 
-        aTimer.Elapsed += OnTimedEvent;
-        aTimer.AutoReset = true;
-        aTimer.Enabled = true;
+        task = QuestionService.GetQuestionNumber();
+        if (task != listFoo.Count)
+        {
+            question = listFoo[task].QuestionText;
+            solution = "3"; //TODO 
+            listA.Clear();
+            listA.Add(1, listFoo[task].Answer1);
+            listA.Add(2, listFoo[task].Answer2);
+            listA.Add(3, listFoo[task].Answer3);
+        }
+        result = "";
+        disable = false;
     }
 
     void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if(time > 0)
+        if(QuestionService.GetTime() <= 0)
         {
-            time--;       
-        }
-        else
-        {
-            if(task < 4){
-                task++;
+            if(task < listFoo.Count){
                 valuebar = valuebar + 33;
-                aTimer.Dispose();
                 SetGame();
             }     
-            if(task == 4){
+            if(task == listFoo.Count){
                 valuebar = 100;
                 //update points in db
                 LeaderboardService.AddPoints(new Leaderboard(){
                     Username = username,
                     Points = points
                 });
-                aTimer.Stop();
+                // TODO in service => aTimer.Stop();
             }      
         }
 

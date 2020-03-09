@@ -3,11 +3,13 @@ using quiz.shared;
 
 namespace quiz.server.Data
 {
-    public class LeaderboardDbContext : DbContext
+    public class QuizDbContext : DbContext
      {
         public DbSet<Leaderboard> Leaderboards { get; set; }
 
-        public LeaderboardDbContext(DbContextOptions<LeaderboardDbContext> options) : base(options)
+        public DbSet<Question> Questions { get; set; }
+        
+        public QuizDbContext(DbContextOptions<QuizDbContext> options) : base(options)
         {
         }
      }
