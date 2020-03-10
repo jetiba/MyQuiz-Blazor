@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using quiz.server.Data;
-using quiz.server.Services;
-using quiz.shared;
 
 namespace quiz.server.Controllers
 {

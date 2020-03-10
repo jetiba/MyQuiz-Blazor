@@ -2,7 +2,7 @@
 using System;
 using System.Timers;
 
-namespace quiz.server.Services
+namespace quiz.shared.Services
 {
     public class TimerHelper : ITimerHelper
     {

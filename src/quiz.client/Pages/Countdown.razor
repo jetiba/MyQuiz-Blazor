@@ -72,8 +72,6 @@
     [Parameter]
     public RenderFragment TaskComponent { get; set; }
     int task = 0;
-    @* int time = 0; *@
-    int valuebar = 0;
     int points = 0;
     string question = ""; 
     List<string> listQ;
@@ -93,7 +91,7 @@
     {  
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         username = authState.User.Identity.Name;
-        aTimer = await QuestionService.GetTimer();
+        QuestionService.GetTimer(ref aTimer);
         aTimer.Elapsed += OnTimedEvent;
         
         listFoo = await QuestionService.GetQuestions();
@@ -133,14 +131,14 @@
 
     void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if(QuestionService.GetTime() <= 0)
+        if(QuestionService.GetTime() == 0)
+            disable = true;
+        if(QuestionService.GetTime() == 10)
         {
             if(task < listFoo.Count){
-                valuebar = valuebar + 33;
                 SetGame();
             }     
             if(task == listFoo.Count){
-                valuebar = 100;
                 //update points in db
                 LeaderboardService.AddPoints(new Leaderboard(){
                     Username = username,

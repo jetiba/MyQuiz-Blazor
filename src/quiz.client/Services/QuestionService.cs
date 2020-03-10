@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
 using quiz.client.Services;
 using quiz.shared;
+using quiz.shared.Services;
 
 namespace quiz.client
 {
@@ -18,7 +19,6 @@ namespace quiz.client
          private readonly HttpClient _httpClient;
         //private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
-
         private Timer aTimer;
         private static int time;
         private static int questionNumber;
@@ -65,14 +65,12 @@ namespace quiz.client
              return listUser;
         }
 
-        public async Task<Timer> GetTimer()
+        public void GetTimer(ref Timer timer)
         {
-            // timer = aTimer;
-            aTimer = await _httpClient.GetJsonAsync<Timer>("api/SampleData/GetUniqueTimer");
-            return aTimer;
+            timer = aTimer;
         }
 
-        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private async void OnTimedEvent(Object source, ElapsedEventArgs e)
         {
             if(time > 0)
             {
@@ -80,7 +78,11 @@ namespace quiz.client
             }
             else
             {
-                time = 10;
+                aTimer.Stop();
+                await Task.Delay(3000);
+                aTimer.Start();
+                
+                time = 11;
                 questionNumber++;
             }
         }

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using quiz.server.Services;
+using quiz.shared.Services;
 
 namespace quiz.server.Controllers
 {
@@ -29,18 +29,6 @@ namespace quiz.server.Controllers
                 TemperatureC = rng.Next(-20, 55),
                 Summary = Summaries[rng.Next(Summaries.Length)]
             });
-        }
-
-        [HttpGet("[action]")]
-        public Timer GetUniqueTimer()
-        {
-            return new TimerHelper().GetTimer();
-        }
-
-        [HttpGet("[action]")]
-        public int GetUniqueTime()
-        {
-            return new TimerHelper().GetTime();
         }
     }
 }
