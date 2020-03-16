@@ -7,67 +7,79 @@
 
     <div class="container page-centered">
 
-        <div class="row">
-            @if(task != listFoo.Count){
-                <div class="col rounded-borders">
-                        Domanda: @task
-                </div>
-                <div class="col-3 rounded-borders">                      
-                        Punti: @points
-                </div>
-            }
-            else {
-                <a class="btn btn-primary" href="leaderboard" role="button">Vedi la classifica !</a>
-                <div class="alert alert-danger" role="alert" style="margin-bottom: 0">
-                    Gioco completato!
-                </div>
-                <div class="alert alert-secondary" role="alert" style="margin-bottom: 0">
-                    Hai totalizzato @points punti
-                </div>                 
-            }
-        </div>
-    </div>
+        @if(containsQuestions && task != 0){
 
-
-    @if(task != listFoo.Count){
-        <div class="container">
             <div class="row">
-                <div class="col rounded-borders-full">
-                        @question              
-                </div>
-                @if(QuestionService.GetTime() > 0){
-                    <div class="col-3 rounded-borders-timer">                      
-                            @QuestionService.GetTime()
+                @if(task != listFoo.Count+1){
+                    <div class="col rounded-borders">
+                            Domanda: @task
+                    </div>
+                    <div class="col-3 rounded-borders">                      
+                            Punti: @points
                     </div>
                 }
-                else if(!disable)
-                {
-                    <div class="col rounded-borders-alert">Tempo Scaduto!!</div>
+                else {
+                    <div class="col rounded-borders-full">
+                        Gioco completato!
+                    </div>
+                    <div class="col rounded-borders">
+                        Hai totalizzato @points punti
+                    </div>
+                    <div class="col rounded-borders">
+                        <a href="/leaderboard">Vedi la classifica</a>
+                    </div>              
                 }
-                 
             </div>
-        </div>
-            <div class="row">
-                <div class="col">
-                @foreach(var a in listA){
-                    <button type="button" 
-                            class="btn btn-outline-primary btn-lg btn-block" 
-                            disabled="@disable"
-                            @onclick="@(e => CheckAnswer(e, a.Key))" style="display: block; margin-bottom: 5px;">@a.Value</button>
-                }
-                </div>
-            </div>
-            <div class="row">
-                @if(result == "CORRECT"){
-                    <div class="col rounded-borders-success">CORRECT</div>
-                }
-                else if(result == "INCORRECT"){
-                    <div class="col rounded-borders-alert">INCORRECT</div>
-                }  
-            </div>
-             
-    }
 
+
+            @if(task != listFoo.Count+1){
+                <div class="container">
+                    <div class="row">
+                        <div class="col rounded-borders-full">
+                                @question              
+                        </div>
+                        @* @if(QuestionService.GetTime() > 0){ *@
+                            <div class="col-3 rounded-borders-timer">                      
+                                    @QuestionService.GetTime()
+                            </div>
+                        @* } *@
+                        
+                        
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col">
+                        @foreach(var a in listA){
+                            <button type="button" 
+                                    class="btn btn-outline-primary btn-lg btn-block" 
+                                    disabled="@disable"
+                                    @onclick="@(e => CheckAnswer(e, a.Value))" style="display: block; margin-bottom: 5px;">@a.Value</button>
+                        }
+                        </div>
+                    </div>
+                    <div class="row">
+                        @if(result == "CORRECT"){
+                            <div class="col rounded-borders-success">CORRECT</div>
+                        }
+                        else if(result == "INCORRECT"){
+                            <div class="col rounded-borders-alert">INCORRECT</div>
+                        } 
+                        else if(disable && QuestionService.GetTime() == 0)
+                        {
+                            <div class="col rounded-borders-alert">Tempo Scaduto!!</div>
+                        } 
+                    </div>
+                    
+            }
+        }
+        else{
+            <div class="row">
+                <div class="col rounded-borders">
+                      Attendi, tra poco saranno disponibili nuove domande...
+                </div>
+            </div>        
+        }
+</div>
 @code {
     [Parameter]
     public RenderFragment TaskComponent { get; set; }
@@ -87,6 +99,8 @@
 
     string solution = "";
 
+    bool containsQuestions = false;
+
     protected override async Task OnInitializedAsync()
     {  
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -95,14 +109,18 @@
         aTimer.Elapsed += OnTimedEvent;
         
         listFoo = await QuestionService.GetQuestions();
+
+        containsQuestions = listFoo.Count != 0;
+
+        QuestionService.StartTime();
         
-        SetGame();
+        @* SetGame(); *@
     }
 
-    void CheckAnswer(MouseEventArgs e, int answer)
+    void CheckAnswer(MouseEventArgs e, string answer)
     {
         disable = true;
-        if(answer.ToString() == solution){
+        if(answer == solution){
             //TODO => check if already answer
             points++;
             result = "CORRECT";
@@ -116,14 +134,14 @@
     void SetGame(){
 
         task = QuestionService.GetQuestionNumber();
-        if (task != listFoo.Count)
+        if (task != listFoo.Count+1)
         {
-            question = listFoo[task].QuestionText;
-            solution = "3"; //TODO 
+            question = listFoo[task-1].QuestionText;
+            solution = listFoo[task-1].Solution;
             listA.Clear();
-            listA.Add(1, listFoo[task].Answer1);
-            listA.Add(2, listFoo[task].Answer2);
-            listA.Add(3, listFoo[task].Answer3);
+            listA.Add(1, listFoo[task-1].Answer1);
+            listA.Add(2, listFoo[task-1].Answer2);
+            listA.Add(3, listFoo[task-1].Answer3);
         }
         result = "";
         disable = false;
@@ -131,20 +149,22 @@
 
     void OnTimedEvent(Object source, ElapsedEventArgs e)
     {
-        if(QuestionService.GetTime() == 0)
+        if(QuestionService.GetTime() == 0) {
             disable = true;
+        }
         if(QuestionService.GetTime() == 10)
         {
-            if(task < listFoo.Count){
+            if(task < listFoo.Count+1){
                 SetGame();
             }     
-            if(task == listFoo.Count){
+            if(task == listFoo.Count+1){
                 //update points in db
                 LeaderboardService.AddPoints(new Leaderboard(){
                     Username = username,
                     Points = points
                 });
-                // TODO in service => aTimer.Stop();
+                // TODO in service
+                aTimer.Dispose();
             }      
         }
 

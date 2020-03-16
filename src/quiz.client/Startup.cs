@@ -15,7 +15,7 @@ namespace quiz.client
             services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ILeaderboardService, LeaderboardService>();
-            services.AddSingleton<IQuestionService, QuestionService>();
+            services.AddScoped<IQuestionService, QuestionService>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

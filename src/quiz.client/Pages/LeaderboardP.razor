@@ -1,8 +1,11 @@
 @page "/Leaderboard"
 @inject ILeaderboardService LeaderboardService
 
+<div class="container page-centered">
 <h3> Leaderboard </h3>
 
+<AuthorizeView>
+        <Authorized>
 <div class="table-responsive">
     <table class="table">
         <thead>
@@ -28,6 +31,20 @@
     </table>
 </div>
 
+</Authorized>
+        <NotAuthorized>
+                <div class="row">
+                <div class="col">
+                    <h5>Questa pagina è disponibile solo per gli utenti registrati <br />
+                    Esegui il login oppure registrati come nuovo utente</h5>
+                    <a class="btn btn-primary" href="login" role="button">Login</a>
+                    <a class="btn btn-primary" href="register" role="button">Registrati</a>
+
+                </div>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
 @code {
 
     int i = 0;

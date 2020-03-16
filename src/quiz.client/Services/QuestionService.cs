@@ -32,9 +32,7 @@ namespace quiz.client
             //_authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
             aTimer = new System.Timers.Timer(1000);
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
-            aTimer.Elapsed += OnTimedEvent;
+            
             questionNumber = 0;
         }
 
@@ -54,15 +52,23 @@ namespace quiz.client
 
         public async Task<List<Question>> GetQuestions()
         {
-            if(!alreadyStarted){
+            var result = await _httpClient.GetAsync("api/Question/GetQuestions");
+            var jsonResult = await result.Content.ReadAsStringAsync();
+            var listUser = JsonConvert.DeserializeObject<List<Question>>(jsonResult);
+
+            return listUser;
+        }
+
+        public void StartTime()
+        {
+            if (!alreadyStarted)
+            {
+                aTimer.AutoReset = true;
+                aTimer.Enabled = true;
+                aTimer.Elapsed += OnTimedEvent;
                 aTimer.Start();
                 alreadyStarted = true;
             }
-             var result = await _httpClient.GetAsync("api/Question/GetQuestions");
-             var jsonResult = await result.Content.ReadAsStringAsync();
-             var listUser = JsonConvert.DeserializeObject<List<Question>>(jsonResult);
-             
-             return listUser;
         }
 
         public void GetTimer(ref Timer timer)
@@ -79,10 +85,10 @@ namespace quiz.client
             else
             {
                 aTimer.Stop();
-                await Task.Delay(3000);
+                await Task.Delay(1000);
                 aTimer.Start();
                 
-                time = 11;
+                time = 10;
                 questionNumber++;
             }
         }

@@ -8,6 +8,7 @@ namespace quiz.client.Services
     {
         void GetTimer(ref Timer timer);
         int GetTime();
+        void StartTime();
         Task<List<Question>> GetQuestions();
         Task<bool> AddQuestions(List<Question> questionsList);
         int GetQuestionNumber();
