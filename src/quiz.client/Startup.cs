@@ -10,12 +10,17 @@ namespace quiz.client
     {
         public void ConfigureServices(IServiceCollection services)
         {
-             services.AddBlazoredLocalStorage();
-            services.AddAuthorizationCore();
+            services.AddBlazoredLocalStorage();
+            // services.AddAuthorizationCore();
             services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ILeaderboardService, LeaderboardService>();
             services.AddScoped<IQuestionService, QuestionService>();
+            services.AddAuthorizationCore(options =>
+            {
+                options.AddPolicy("RequireAdministratorRole",
+                    policy => policy.RequireRole("Admin"));
+            });
         }
 
         public void Configure(IComponentsApplicationBuilder app)

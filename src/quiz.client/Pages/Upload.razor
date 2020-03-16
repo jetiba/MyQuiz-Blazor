@@ -8,10 +8,15 @@
 
 @inject IQuestionService QuestionService
 
-<AuthorizeView>
+<div class="container page-centered">
+
+<AuthorizeView Roles="Admin">
     <Authorized> 
-    
-        <h1>Questions editor</h1>
+         <div class="row">
+            <div class="col">
+                <h1>Questions editor</h1>
+            </div>
+         </div>
 
         <div class="drag-drop-zone">
             <InputFile OnChange="ViewFile" />
@@ -20,23 +25,53 @@
 
         @if (fileName != null)
         {
-            <h3>@fileName</h3>
+            <div class="row">
+                <div class="col">
+                    Il file @fileName è stato caricato con successo <br />
+                    Sono state caricate @records.Count domande
+                </div>
+            </div>
 
-            <p>Sono state caricate @records.Count domande</p>
-            <p> Controlla le domande prima di procedere all'avvio del quiz </p>
-
-            @* TODO: tabular format of the questions list *@
-                @foreach(var f in records){
-                    <p> @f.QuestionID, @f.QuestionText, @f.Answer1, @f.Answer2, @f.Answer3, @f.Solution </p>
-                }
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Domanda</th>
+                            <th scope="col">Risposta 1</th>
+                            <th scope="col">Risposta 2</th>
+                            <th scope="col">Risposta 3</th>
+                            <th scope="col">Soluzione</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var f in records)
+                        {
+                            <tr>
+                                <th scope="row">@f.QuestionID</th>
+                                <td> @f.QuestionText</td>
+                                <td>@f.Answer1</td>
+                                <td>@f.Answer2</td>
+                                <td>@f.Answer3</td>
+                                <td>@f.Solution</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         }
 
 </Authorized>
    <NotAuthorized>
-       <p> Questi contenuti sono disponibili solo per gli amministratori del quiz </p>
+      <div class="row">
+            <div class="col rounded-borders">
+                Questi contenuti sono disponibili solo per gli amministratori del quiz 
+            </div>
+        </div>
    </NotAuthorized>
 </AuthorizeView>
 
+</div>
 @code {
     const string DefaultStatus = "Drop a text file here to view it, or click to choose a file";
     const int MaxFileSize = 5 * 1024 * 1024; // 5MB

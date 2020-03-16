@@ -1,0 +1,35 @@
+@page "/delete"
+
+<div class="container page-centered">
+
+<AuthorizeView Roles="Admin">
+    <Authorized> 
+         <div class="row">
+            <div class="col">
+                <h1>Resetta il quiz</h1>
+            </div>
+         </div>
+         <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-outline-primary btn-lg btn-block" 
+                    @onclick="@(e => DeleteQuestions(e))">Elimina tutte le domande</button>
+            </div>  
+        </div>
+    </Authorized>
+   <NotAuthorized>
+       <div class="row">
+            <div class="col rounded-borders">
+                Questi contenuti sono disponibili solo per gli amministratori del quiz 
+            </div>
+        </div>
+   </NotAuthorized>
+</AuthorizeView>
+
+</div>
+
+@code 
+{
+    public void DeleteQuestions(MouseEventArgs e){
+        Console.WriteLine("TODO: eliminare domande nel db");
+    }
+}

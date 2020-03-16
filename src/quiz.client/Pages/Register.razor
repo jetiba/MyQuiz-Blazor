@@ -2,7 +2,12 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<h1>Register</h1>
+<div class="container page-centered">
+    <div class="row">
+            <div class="col">
+                <h1>Registrati</h1>
+            </div>  
+        </div>
 
 @if (ShowErrors)
 {
@@ -44,6 +49,7 @@
             <button type="submit" class="btn btn-primary">Submit</button>
         </EditForm>
     </div>
+</div>
 </div>
 
 @code {

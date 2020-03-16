@@ -28,7 +28,7 @@ namespace quiz.server.Controllers
         }
 
         [HttpPost("[action]")]
-        //[Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddQuestions([FromBody]List<Question> questionsList)
         {
             if(questionsList.Count > 0)
