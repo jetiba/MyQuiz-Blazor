@@ -1,12 +1,14 @@
 @page "/Upload"
 
 @using BlazorInputFile
+@using BlazorFileSaver
 @using System.IO
 @using CsvHelper
 @using System.Globalization
 @using System.Text
 
 @inject IQuestionService QuestionService
+@inject IBlazorFileSaver BFS
 
 <div class="container page-centered">
 
@@ -17,6 +19,12 @@
                 <h1>Questions editor</h1>
             </div>
          </div>
+
+          <div class="row" style="margin-top:20px">
+            <div class="col">
+                <h5><a href="/upload" @onclick="@(e => SaveFile(e))">Clicca qui</a> per scaricare il template per caricare le nuove domande</h5>
+            </div>  
+        </div>
 
         <div class="drag-drop-zone">
             <InputFile OnChange="ViewFile" />
@@ -83,14 +91,12 @@
 
     List<Question> records = new List<Question>();
 
-    @* public class Foo {
-        public string QuestionID { get; set; }
-        public string QuestionText { get; set; }
-        public string Answer1 { get; set; }
-        public string Answer2 { get; set; }
-        public string Answer3 { get; set; }
-        public string Solution { get; set; }
-    } *@
+    public async Task SaveFile(MouseEventArgs e)
+    {
+        var data = await QuestionService.GetTemplateFile();
+
+       await BFS.SaveAs("Template.csv", data, "text/csv");
+    }
 
     async Task ViewFile(IFileListEntry[] files)
     {
@@ -129,9 +135,15 @@
                             Answer3 = csv.GetField("Answer3"),
                             Solution = csv.GetField("Solution")
                         };
-                        records.Add(record);
+                        if(record.HasEmptyProperties())
+                        {
+                            Console.WriteLine("il record ha delle proprietà nulle");
+                        }
+                        else
+                        {
+                            records.Add(record);
+                        }
                     }
-                    //records = csv.GetRecords<Question>().ToList();
                     updated = await QuestionService.AddQuestions(records);
 
                     status = updated ? "Succeded" : "Failed";

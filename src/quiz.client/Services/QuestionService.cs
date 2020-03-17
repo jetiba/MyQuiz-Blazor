@@ -101,5 +101,22 @@ namespace quiz.client
         {
             return questionNumber;
         }
+
+        public async Task<bool> DeleteAllQuestions()
+        {
+            var result = await _httpClient.DeleteAsync("api/Question/DeleteQuestions");
+
+            return result.IsSuccessStatusCode;
+        }
+
+        public async Task<string> GetTemplateFile()
+        {
+            Console.WriteLine("metodo");
+            var result = await _httpClient.GetStringAsync("api/Question/GetTemplateFile");
+            Console.WriteLine(result);
+            // var data = await result.Content.ReadAsStringAsync();
+
+            return result;
+        }
     }
 }

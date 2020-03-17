@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -45,6 +46,36 @@ namespace quiz.server.Controllers
             {
                 return new BadRequestResult();
             }
+        }
+
+        [HttpDelete("[action]")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteQuestions()
+        {
+            var qdata = await ldbcontext.Questions.AsNoTracking().ToListAsync();
+            if(qdata.Count > 0)
+            {
+                ldbcontext.Questions.RemoveRange(qdata);
+                await ldbcontext.SaveChangesAsync();
+
+                return new OkResult();
+            }
+            else
+            {
+                return new NotFoundResult();
+            }            
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetTemplateFile()
+        {
+            var path = Path.Combine(
+                            Directory.GetCurrentDirectory(), 
+                            "StaticFiles", 
+                            "Template.csv"
+                        );
+            var data = await System.IO.File.ReadAllTextAsync(path);
+            return new OkObjectResult(data);
         }
     }
 }

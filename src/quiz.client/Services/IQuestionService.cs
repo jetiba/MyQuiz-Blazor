@@ -12,6 +12,8 @@ namespace quiz.client.Services
         Task<List<Question>> GetQuestions();
         Task<bool> AddQuestions(List<Question> questionsList);
         int GetQuestionNumber();
+        Task<bool> DeleteAllQuestions();
+        Task<string> GetTemplateFile();
 
     }
 }

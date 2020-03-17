@@ -27,4 +27,10 @@
     <ProjectReference Include="..\quiz.shared\quiz.shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="StaticFiles\Template.csv">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

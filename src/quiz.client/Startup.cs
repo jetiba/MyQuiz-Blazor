@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using quiz.client.Services;
+using BlazorFileSaver;
 
 namespace quiz.client
 {
@@ -21,6 +22,7 @@ namespace quiz.client
                 options.AddPolicy("RequireAdministratorRole",
                     policy => policy.RequireRole("Admin"));
             });
+            services.AddBlazorFileSaver();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

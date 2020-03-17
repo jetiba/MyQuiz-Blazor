@@ -1,5 +1,7 @@
 @page "/delete"
 
+@inject IQuestionService QuestionService
+
 <div class="container page-centered">
 
 <AuthorizeView Roles="Admin">
@@ -15,6 +17,15 @@
                     @onclick="@(e => DeleteQuestions(e))">Elimina tutte le domande</button>
             </div>  
         </div>
+        @if(deleted)
+        {
+            <div class="row">
+                <div class="col rounded-borders">
+                    Le domande sono state eliminate, il quiz è terminato. <br />
+                    Torna alla pagina <a href="/upload">di carimento</a> per caricare un nuovo quiz
+                </div>  
+            </div>
+        }       
     </Authorized>
    <NotAuthorized>
        <div class="row">
@@ -29,7 +40,10 @@
 
 @code 
 {
-    public void DeleteQuestions(MouseEventArgs e){
-        Console.WriteLine("TODO: eliminare domande nel db");
+    bool deleted = false;
+
+    public async Task DeleteQuestions(MouseEventArgs e)
+    {
+        deleted = await QuestionService.DeleteAllQuestions();
     }
 }
