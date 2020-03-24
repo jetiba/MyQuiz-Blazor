@@ -49,18 +49,25 @@ namespace quiz.client.Services
             // _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
 
             // return loginResult;
-            var result = await _httpClient.PostJsonAsync<LoginResult>("api/Login", loginModel);
+            var loginAsJson = JsonSerializer.Serialize(loginModel);
+            var result = await _httpClient.PostAsync("api/Login", new StringContent(loginAsJson, Encoding.UTF8, "application/json"));
+            var loginResult = JsonSerializer.Deserialize<LoginResult>(await result.Content.ReadAsStringAsync(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            if (result.Successful)
+            if (!result.IsSuccessStatusCode)
             {
-                await _localStorage.SetItemAsync("authToken", result.Token);
-                ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(result.Token);
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", result.Token);
-
-                return result;
+                return loginResult;
             }
 
-            return result;
+            if (loginResult.Successful)
+            {
+                await _localStorage.SetItemAsync("authToken", loginResult.Token);
+                ((ApiAuthenticationStateProvider)_authenticationStateProvider).MarkUserAsAuthenticated(loginResult.Token);
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", loginResult.Token);
+
+                return loginResult;
+            }
+
+            return loginResult;
         }
 
         public async Task Logout()

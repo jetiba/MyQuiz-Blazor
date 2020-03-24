@@ -16,8 +16,8 @@ namespace quiz.client
 {
     public class QuestionService : IQuestionService
     {
-         private readonly HttpClient _httpClient;
-        //private readonly AuthenticationStateProvider _authenticationStateProvider;
+        private readonly HttpClient _httpClient;
+        private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
         private Timer aTimer;
         private static int time;
@@ -25,11 +25,11 @@ namespace quiz.client
         private bool alreadyStarted = false;
 
         public QuestionService(HttpClient httpClient,
-                           //AuthenticationStateProvider authenticationStateProvider,
+                           AuthenticationStateProvider authenticationStateProvider,
                            ILocalStorageService localStorage)
         {
             _httpClient = httpClient;
-            //_authenticationStateProvider = authenticationStateProvider;
+            _authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
             aTimer = new System.Timers.Timer(1000);
             

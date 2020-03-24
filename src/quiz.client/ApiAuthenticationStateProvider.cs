@@ -30,6 +30,12 @@ namespace quiz.client
                 return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
             }
 
+            var exp = ParseExpFromJwt(savedToken);
+            if(exp.AddMinutes(-30) < DateTime.Now)
+            {
+                return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            }
+
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", savedToken);
 
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(ParseClaimsFromJwt(savedToken), "jwt")));
@@ -84,6 +90,26 @@ namespace quiz.client
             claims.AddRange(keyValuePairs.Select(kvp => new Claim(kvp.Key, kvp.Value.ToString())));
 
             return claims;
+        }
+
+        private DateTime ParseExpFromJwt(string jwt)
+        {
+            var claims = new List<Claim>();
+            var payload = jwt.Split('.')[1];
+            var jsonBytes = ParseBase64WithoutPadding(payload);
+            var keyValuePairs = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonBytes);
+
+            keyValuePairs.TryGetValue("exp", out object expiration);
+            
+            DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            if(int.TryParse(expiration.ToString(), out int tokentime))
+            {
+                return epoch.AddSeconds(tokentime);                
+            }
+            else
+            {
+                return epoch.AddMinutes(45);
+            }
         }
 
         private byte[] ParseBase64WithoutPadding(string base64)

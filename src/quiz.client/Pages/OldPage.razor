@@ -1,4 +1,4 @@
-@page "/delete"
+@page "/oldpage"
 
 @inject IQuestionService QuestionService
 
@@ -8,23 +8,21 @@
     <Authorized> 
          <div class="row">
             <div class="col">
-                <h1>Attenzione</h1>
+                <h1>Resetta il quiz</h1>
             </div>
          </div>
          <div class="row">
             <div class="col">
-                Al momento c'è un quiz attivo. Vuoi cancellare le domande per terminarlo? <br />
                 <button type="button" class="btn btn-outline-primary btn-lg btn-block" 
                     @onclick="@(e => DeleteQuestions(e))">Elimina tutte le domande</button>
-                Torna alla pagina <a href="/administration">di gestione</a>
-            </div>
+            </div>  
         </div>
         @if(deleted)
         {
             <div class="row">
                 <div class="col rounded-borders">
                     Le domande sono state eliminate, il quiz è terminato. <br />
-                    Torna alla pagina <a href="/upload">di caricamento</a> per caricare un nuovo quiz
+                    Torna alla pagina <a href="/upload">di carimento</a> per caricare un nuovo quiz
                 </div>  
             </div>
         }       

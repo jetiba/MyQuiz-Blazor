@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace quiz.server.Controllers
 {
@@ -33,5 +34,6 @@ namespace quiz.server.Controllers
 
             return Ok(new RegisterResult { Successful = true });
         }
+
     }
 }

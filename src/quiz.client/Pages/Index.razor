@@ -1,5 +1,8 @@
 ﻿@page "/"
 
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 <div class="container page-centered">
     <div class="row">
         <div class="col">
@@ -11,7 +14,7 @@
         <Authorized>
             <div class="row">
                 <div class="col">
-                    <a class="btn btn-primary" href="countdown" role="button">Inizia il quiz!</a>
+                    <a class="btn btn-primary" href="#" @onclick="@(e => RedirectTo(e))" role="button">Inizia il quiz!</a>
                 </div>
             </div>
         </Authorized>
@@ -29,3 +32,16 @@
 
 </div>
 
+@code
+{
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
+
+    public void RedirectTo(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo("/countdown", true);
+    }
+}

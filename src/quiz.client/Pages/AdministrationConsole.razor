@@ -1,5 +1,7 @@
 @page "/Administration"
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IQuestionService QuestionService
+@inject NavigationManager NavigationManager
 
 <div class="container page-centered">
 <AuthorizeView Roles="Admin">
@@ -11,7 +13,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <a class="btn btn-primary btn-lg btn-block" href="upload" role="button">Carica nuove domande</a>
+                <a class="btn btn-primary btn-lg btn-block" href="#" @onclick="@(e => CheckIfQuestionExist(e))" role="button">Carica nuove domande</a>
             </div>  
             <div class="col">
                 <a class="btn btn-primary btn-lg btn-block" href="delete" role="button">Termina il quiz</a>
@@ -27,3 +29,20 @@
    </NotAuthorized>
 </AuthorizeView>
 </div>
+
+
+@code
+{
+    public async void CheckIfQuestionExist(MouseEventArgs e)
+    {
+        var list = await QuestionService.GetQuestions();
+        if( list.Count > 0)
+        {
+            NavigationManager.NavigateTo("/delete", true);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/upload", true);
+        }
+    }
+}
