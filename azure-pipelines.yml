@@ -23,7 +23,7 @@ steps:
       inputs:
         command: 'publish'
         publishWebProjects: true
-        arguments: '-r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        arguments: '$(System.DefaultWorkingDirectory)/src/quiz.server/quiz.server.csproj -r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
         zipAfterPublish: true
 
     - task: PublishBuildArtifacts@1
