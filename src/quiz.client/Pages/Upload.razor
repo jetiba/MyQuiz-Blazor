@@ -122,6 +122,7 @@
                 var reader = new System.IO.StreamReader(stream, Encoding.UTF7);
                 using (var csv = new CsvReader(reader, CultureInfo.CurrentUICulture))
                 {
+                    csv.Configuration.Delimiter = ",";
                     csv.Read();
                     csv.ReadHeader();
                     while (csv.Read())
