@@ -7,7 +7,7 @@
 
     <div class="container page-centered">
 
-        @if(containsQuestions && task != 0){
+        @if(containsQuestions && task != 0 && !hasPlayed){
 
             <div class="row">
                 @if(task != listFoo.Count+1){
@@ -72,11 +72,22 @@
                     
             }
         }
-        else{
+        else
+        {
             <div class="row">
                 <div class="col rounded-borders">
-                      Attendi, tra poco saranno disponibili nuove domande... <br />
-                      Oppure aggiorna la pagina
+                    @if(hasPlayed){
+                        <p> hai già completato il quiz della settimana, 
+                            ti aspettiamo la prossima settimana per un nuovo quiz 
+                        </p>
+                    }
+                    else{
+                        <p>
+                            Attendi, tra poco saranno disponibili nuove domande... <br />
+                            Oppure aggiorna la pagina
+                        </p>
+                    }
+                      
                 </div>
             </div>        
         }
@@ -102,20 +113,30 @@
 
     bool containsQuestions = false;
 
+    bool hasPlayed = false;
+
     protected override async Task OnInitializedAsync()
     {  
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         username = authState.User.Identity.Name;
-        QuestionService.GetTimer(ref aTimer);
-        aTimer.Elapsed += OnTimedEvent;
-        
-        listFoo = await QuestionService.GetQuestions();
 
-        containsQuestions = listFoo.Count != 0;
+        var leaderboard = await LeaderboardService.GetAllPoints();
+        hasPlayed = leaderboard.Where(x => x.Username == username && x.HasPlayedLastGame).Any();
+        if(!hasPlayed)
+        {
+            QuestionService.GetTimer(ref aTimer);
+            aTimer.Elapsed += OnTimedEvent;
+            
+            listFoo = await QuestionService.GetQuestions();
 
-        QuestionService.StartTime();
-        
-        @* SetGame(); *@
+            containsQuestions = listFoo.Count != 0;
+
+            if(containsQuestions)
+            {
+                QuestionService.StartTime();
+            }
+            
+        }
     }
 
     void CheckAnswer(MouseEventArgs e, string answer)
@@ -162,7 +183,9 @@
                 //update points in db
                 LeaderboardService.AddPoints(new Leaderboard(){
                     Username = username,
-                    Points = points
+                    Points = points,
+                    GamePlayed = 1,
+                    HasPlayedLastGame = true
                 });
                 // TODO in service
                 aTimer.Dispose();

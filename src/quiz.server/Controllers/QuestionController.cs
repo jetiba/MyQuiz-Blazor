@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using quiz.server.Data;
 
 namespace quiz.server.Controllers
@@ -13,10 +16,12 @@ namespace quiz.server.Controllers
     public class QuestionController : Controller
     {
         private readonly QuizDbContext ldbcontext;
+        private TelemetryClient telemetryClient;
 
-        public QuestionController(QuizDbContext ldbcontext)
+        public QuestionController(QuizDbContext ldbcontext, TelemetryClient telemetryClient)
         {
             this.ldbcontext = ldbcontext;
+            this.telemetryClient = telemetryClient;
         }
 
         [HttpGet("[action]")]
@@ -38,7 +43,23 @@ namespace quiz.server.Controllers
                     await ldbcontext.Questions.AddAsync(q);
                     
                 }
-                await ldbcontext.SaveChangesAsync();
+                try
+                {
+                    await ldbcontext.SaveChangesAsync();
+                }
+                catch(Exception e)
+                {
+                    telemetryClient.TrackException(e,
+                                           new Dictionary<string, string>() { 
+                                               { "operation", "upload" },
+                                               { "questions", JsonConvert.SerializeObject(questionsList) }, 
+                                               { "user", User.Identity.Name }});
+                }
+
+                telemetryClient.TrackEvent("questionsuploaded",
+                                           new Dictionary<string, string>() { 
+                                               { "questions", JsonConvert.SerializeObject(questionsList) },
+                                               { "user", User.Identity.Name }});
 
                 return new OkResult();
             }
@@ -58,6 +79,30 @@ namespace quiz.server.Controllers
                 ldbcontext.Questions.RemoveRange(qdata);
                 await ldbcontext.SaveChangesAsync();
 
+                var leaderboard = await ldbcontext.Leaderboards.ToListAsync();
+                foreach(var l in leaderboard)
+                {
+                    l.HasPlayedLastGame = false;
+                }
+
+                ldbcontext.Leaderboards.UpdateRange(leaderboard);
+
+                try
+                {
+                    await ldbcontext.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    telemetryClient.TrackException(e,
+                                           new Dictionary<string, string>() { 
+                                               { "operation", "delete" }, 
+                                               { "user", User.Identity.Name }});
+                }
+                
+                telemetryClient.TrackEvent("questionsdeleted",
+                                           new Dictionary<string, string>() { 
+                                               { "user", User.Identity.Name }});
+                
                 return new OkResult();
             }
             else

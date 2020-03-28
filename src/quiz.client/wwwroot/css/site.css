@@ -15,7 +15,6 @@ a, .btn-link {
 }
 
 app {
-    position: relative;
     display: flex;
     flex-direction: column;
 }
@@ -297,4 +296,3 @@ app {
         padding: 1rem;
         height: 10rem;
     }
-}

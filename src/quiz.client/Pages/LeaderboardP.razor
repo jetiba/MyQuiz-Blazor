@@ -19,13 +19,16 @@
         <tbody>
             @foreach (var user in listUsers)
             {
-                i++;
-                <tr>
-                    <th scope="row">@i</th>
-                    <td>@user.Username</td>
-                    <td>@user.Points</td>
-                    <td></td>
-                </tr>
+                if(!user.Username.Contains("admin"))
+                {
+                    i++;
+                    <tr>
+                        <th scope="row">@i</th>
+                        <td>@user.Username</td>
+                        <td>@user.Points</td>
+                        <td>@user.GamePlayed</td>
+                    </tr>
+                }             
             }
         </tbody>
     </table>

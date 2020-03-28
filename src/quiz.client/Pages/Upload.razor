@@ -31,7 +31,7 @@
             @status
         </div>
 
-        @if (fileName != null)
+        @if (records.Count > 0)
         {
             <div class="row">
                 <div class="col">
@@ -135,11 +135,7 @@
                             Answer3 = csv.GetField("Answer3"),
                             Solution = csv.GetField("Solution")
                         };
-                        if(record.HasEmptyProperties())
-                        {
-                            Console.WriteLine("il record ha delle proprietà nulle");
-                        }
-                        else
+                        if(!record.HasEmptyProperties())
                         {
                             records.Add(record);
                         }
@@ -147,6 +143,10 @@
                     updated = await QuestionService.AddQuestions(records);
 
                     status = updated ? "Succeded" : "Failed";
+
+                    if(updated){
+                        records = await QuestionService.GetQuestions();
+                    }
                 }
             }
         }

@@ -45,7 +45,6 @@ namespace quiz.client
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 return false;
             }
         }
@@ -111,10 +110,7 @@ namespace quiz.client
 
         public async Task<string> GetTemplateFile()
         {
-            Console.WriteLine("metodo");
             var result = await _httpClient.GetStringAsync("api/Question/GetTemplateFile");
-            Console.WriteLine(result);
-            // var data = await result.Content.ReadAsStringAsync();
 
             return result;
         }

@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using System.Text;
 using quiz.shared.Services;
+using Microsoft.ApplicationInsights.Extensibility;
 
 namespace quiz.server
 {
@@ -28,7 +29,10 @@ namespace quiz.server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddApplicationInsightsTelemetry();
 
+            services.AddSingleton<ITelemetryInitializer, QuizTelemetryInitializer>();
+            
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
