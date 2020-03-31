@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace quiz.server
 {
@@ -20,7 +21,7 @@ namespace quiz.server
 
         private static async Task MainAsync(string[] args)
         {
-            var host = BuildWebHost(args);
+            var host = BuildWebHost(args).Build();
 
             const string name = "admin@example.com";
             const string password = "Quiz@dmin2020";
@@ -58,12 +59,11 @@ namespace quiz.server
             await host.RunAsync();        
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseConfiguration(new ConfigurationBuilder()
-                    .AddCommandLine(args)
-                    .Build())
-                .UseStartup<Startup>()
-                .Build();
+        public static IHostBuilder BuildWebHost(string[] args) =>
+                Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
