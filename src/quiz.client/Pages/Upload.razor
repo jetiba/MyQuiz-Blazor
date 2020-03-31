@@ -20,13 +20,13 @@
             </div>
          </div>
 
-          <div class="row" style="margin-top:20px">
+          <div class="row" style="margin-top:20px" hidden="@updated">
             <div class="col">
                 <h5><a href="/upload" @onclick="@(e => SaveFile(e))">Clicca qui</a> per scaricare il template per caricare le nuove domande</h5>
             </div>  
         </div>
 
-        <div class="drag-drop-zone">
+        <div class="drag-drop-zone" hidden="@updated">
             <InputFile OnChange="ViewFile" />
             @status
         </div>
