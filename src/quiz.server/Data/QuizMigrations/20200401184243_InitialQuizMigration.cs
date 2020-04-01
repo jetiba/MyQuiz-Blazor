@@ -1,23 +1,25 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace quiz.server.Migrations
+namespace quiz.server.Data.QuizMigrations
 {
-    public partial class newmigration : Migration
+    public partial class InitialQuizMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // migrationBuilder.CreateTable(
-            //     name: "Leaderboards",
-            //     columns: table => new
-            //     {
-            //         Username = table.Column<string>(nullable: false),
-            //         Points = table.Column<int>(nullable: false)
-            //     },
-            //     constraints: table =>
-            //     {
-            //         table.PrimaryKey("PK_Leaderboards", x => x.Username);
-            //     });
+            migrationBuilder.CreateTable(
+                name: "Leaderboards",
+                columns: table => new
+                {
+                    Username = table.Column<string>(nullable: false),
+                    Points = table.Column<int>(nullable: false),
+                    GamePlayed = table.Column<int>(nullable: false),
+                    HasPlayedLastGame = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Leaderboards", x => x.Username);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Questions",
