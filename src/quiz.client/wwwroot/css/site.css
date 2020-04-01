@@ -5,13 +5,13 @@ html, body {
 }
 
 a, .btn-link {
-    color: #0366d6;
+    color: #69a816;
 }
 
-.btn-primary {
+.btn-success {
     color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    background-color: #69a816;
+    border-color: #5f9715;
 }
 
 app {
@@ -153,7 +153,7 @@ app {
 
 .rounded-borders-full {
         border-radius: 20px;
-        background: #0073d1;
+        background: #69a816;
         color: #ffff; 
         padding: 20px;
         margin-bottom: 20px;

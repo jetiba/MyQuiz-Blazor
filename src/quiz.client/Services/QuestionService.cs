@@ -43,7 +43,7 @@ namespace quiz.client
                 await _httpClient.PostJsonAsync("api/Question/AddQuestions", questionsList);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

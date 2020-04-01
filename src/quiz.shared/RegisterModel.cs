@@ -14,14 +14,14 @@ namespace quiz.shared
         public string Username { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "La {0} deve contenere minimo {2} e massimo {1} caratteri", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+        [Display(Name = "Conferma password")]
+        [Compare("Password", ErrorMessage = "Le due password non corrispondono")]
         public string ConfirmPassword { get; set; }
     }
 }

@@ -8,29 +8,57 @@
     <div class="container page-centered">
 
         @if(containsQuestions && task != 0 && !hasPlayed){
-
-            <div class="row">
-                @if(task != listFoo.Count+1){
-                    <div class="col rounded-borders">
-                            Domanda: @task
-                    </div>
-                    <div class="col-3 rounded-borders">                      
-                            Punti: @points
+       
+                @if(task != listFoo.Count+1)
+                {
+                    <div class="row">
+                        <div class="col rounded-borders">
+                                Domanda: @task
+                        </div>
+                        <div class="col-3 rounded-borders">                      
+                                Punti: @points
+                        </div>
                     </div>
                 }
-                else {
-                    <div class="col rounded-borders-full">
-                        Gioco completato!
+                else 
+                {
+                    <div class="row">
+                        <div class="col rounded-borders-full">
+                            Gioco completato!
+                        </div>
                     </div>
-                    <div class="col rounded-borders">
-                        Hai totalizzato @points punti
-                    </div>
-                    <div class="col rounded-borders">
-                        <a href="/leaderboard">Vedi la classifica</a>
-                    </div>              
-                }
-            </div>
+                        
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Domanda</th>
+                                    <th scope="col">Risposta Corretta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var qq in listFoo)
+                                {
+                                        <tr>
+                                            <td>@qq.QuestionText</td>
+                                            <td>@qq.Solution</td>
+                                        </tr>           
+                                }
+                            </tbody>
+                        </table>
+                    </div>      
 
+                    <div class="row">   
+                        <div class="col rounded-borders">
+                            Hai totalizzato @points punti
+                        </div>
+                        <div class="col rounded-borders">
+                            <a href="/leaderboard">Vedi la classifica</a>
+                        </div>    
+                    </div>
+
+                }
+            
 
             @if(task != listFoo.Count+1){
                 
@@ -51,7 +79,7 @@
                         <div class="col">
                         @foreach(var a in listA){
                             <button type="button" 
-                                    class="btn btn-outline-primary btn-lg btn-block" 
+                                    class="btn btn-outline-secondary btn-lg btn-block" 
                                     disabled="@disable"
                                     @onclick="@(e => CheckAnswer(e, a.Value))" style="display: block; margin-bottom: 5px;">@a.Value</button>
                         }
@@ -59,10 +87,10 @@
                     </div>
                     <div class="row">
                         @if(result == "CORRECT"){
-                            <div class="col rounded-borders-success">CORRECT</div>
+                            <div class="col rounded-borders-success">RISPOSTA GIUSTA</div>
                         }
                         else if(result == "INCORRECT"){
-                            <div class="col rounded-borders-alert">INCORRECT</div>
+                            <div class="col rounded-borders-alert">RISPOSTA SBAGLIATA</div>
                         } 
                         else if(disable && QuestionService.GetTime() == 0)
                         {
@@ -181,12 +209,14 @@
             }     
             if(task == listFoo.Count+1){
                 //update points in db
-                LeaderboardService.AddPoints(new Leaderboard(){
-                    Username = username,
-                    Points = points,
-                    GamePlayed = 1,
-                    HasPlayedLastGame = true
-                });
+                if(!username.Contains("admin")){
+                    LeaderboardService.AddPoints(new Leaderboard(){
+                        Username = username,
+                        Points = points,
+                        GamePlayed = 1,
+                        HasPlayedLastGame = true
+                    });
+                }
                 // TODO in service
                 aTimer.Dispose();
             }      
