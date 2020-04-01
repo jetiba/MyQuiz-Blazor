@@ -21,7 +21,7 @@ namespace quiz.server
 
         private static async Task MainAsync(string[] args)
         {
-            var host = BuildWebHost(args).Build();
+            var host = BuildWebHost(args);
 
             const string name = "admin@example.com";
             const string password = "Quiz@dmin2020";
@@ -59,11 +59,12 @@ namespace quiz.server
             await host.RunAsync();        
         }
 
-        public static IHostBuilder BuildWebHost(string[] args) =>
-                Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
+                .UseConfiguration(new ConfigurationBuilder()
+                    .AddCommandLine(args)
+                    .Build())
+                .UseStartup<Startup>()
+                .Build();
+        }
 }
