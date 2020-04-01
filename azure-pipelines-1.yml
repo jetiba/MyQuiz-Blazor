@@ -27,14 +27,14 @@ steps:
       displayName: "Create Migration script for ApplicationDbContext"
       inputs:
         targetType: 'inline'
-        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/appscripts.sql –i -c ApplicationDbContext'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/appscripts.sql -i -c ApplicationDbContext'
         workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
 
     - task: Bash@3
       displayName: "Create Migration script for QuizDbContext"
       inputs:
         targetType: 'inline'
-        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/quizscripts.sql –i -c QuizDbContext'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/quizscripts.sql -i -c QuizDbContext'
         workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
 
     - task: DotNetCoreCLI@2
