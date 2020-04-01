@@ -23,34 +23,32 @@ steps:
         targetType: 'inline'
         script: 'dotnet tool install --global dotnet-ef'
 
-    - task: DotNetCoreCLI@2
+    - task: Bash@3
       displayName: "Create Migration script for ApplicationDbContext"
       inputs:
-        command: 'custom'
-        projects: 'src/quiz.server/quiz.server.csproj'
-        custom: 'ef migrations script'
-        arguments: '-o $(Build.ArtifactStagingDirectory)/migrations/appscripts.sql –i -c ApplicationDbContext'
-      
-    - task: DotNetCoreCLI@2
+        targetType: 'inline'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/appscripts.sql –i -c ApplicationDbContext'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
+
+    - task: Bash@3
       displayName: "Create Migration script for QuizDbContext"
       inputs:
-        command: 'custom'
-        projects: 'src/quiz.server/quiz.server.csproj'
-        custom: 'ef migrations script'
-        arguments: '-o $(Build.ArtifactStagingDirectory)/migrations/quizscripts.sql –i -c QuizDbContext'
+        targetType: 'inline'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/quizscripts.sql –i -c QuizDbContext'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
 
     - task: DotNetCoreCLI@2
       displayName: "Publish"
       inputs:
         command: 'publish'
         publishWebProjects: false
-        arguments: '$(System.DefaultWorkingDirectory)/src/quiz.server/quiz.server.csproj -r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+        arguments: '$(System.DefaultWorkingDirectory)/src/quiz.server/quiz.server.csproj -r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/web'
         zipAfterPublish: true
 
     - task: PublishBuildArtifacts@1
       displayName: "Upload Artifacts"
       inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/web' 
         artifactName: 'blazorartifact' 
 
     - task: PublishBuildArtifacts@1
