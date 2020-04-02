@@ -9,6 +9,7 @@
 
 @inject IQuestionService QuestionService
 @inject IBlazorFileSaver BFS
+@inject IBlobStorageService BlobStorageService
 
 <div class="container page-centered">
 
@@ -16,7 +17,7 @@
     <Authorized> 
          <div class="row">
             <div class="col">
-                <h1>Questions editor</h1>
+                <h1>Quiz Editor</h1>
             </div>
          </div>
 
@@ -30,6 +31,43 @@
             <InputFile OnChange="ViewFile" />
             @status
         </div>
+
+        <div class="row" style="margin-top:20px">
+            <div class="col">
+                <InputFile multiple OnChange="SelectContent" hidden="@contentSelected"/>
+                <br />
+                <p> Nota per il caricamento dei contenuti degli sponsor:</p>
+                <p> Devono essere caricati due file: un file di testo (con nome "testo.txt") contenente la descrizione breve dello sponsor e un file immagine (con nome "logo.png") per il logo. </p> <br />
+            </div>
+        </div>
+        @if (selectedFiles.Count == 2)
+        {
+            foreach (var file in selectedFiles)
+            {
+                var isLoading = file.Data.Position > 0;
+
+                <div class="file-row">
+                    <!-- File info -->
+                    <div>
+                        <h2>@file.Name</h2>
+                        Tipo di file: <strong>@file.Type</strong>
+                    </div>
+
+                    <!-- Upload button -->
+                    <button @onclick="@(e => LoadFile(file, e))" disabled="@isLoading">
+                        @if (!isLoading)
+                        {
+                            <span>Carica</span>
+                        }
+                        else
+                        {
+                            <span>Caricato @((100.0 * file.Data.Position / file.Size).ToString("0"))%</span>
+                        }
+                    </button>
+                </div>
+            }
+        }
+        
 
         @if (records.Count > 0)
         {
@@ -88,8 +126,13 @@
     string fileName;
 
     bool updated = false;
+    
 
     List<Question> records = new List<Question>();
+
+    List<IFileListEntry> selectedFiles = new List<IFileListEntry>();
+
+    bool contentSelected = false;
 
     public async Task SaveFile(MouseEventArgs e)
     {
@@ -120,9 +163,11 @@
                 await file.Data.CopyToAsync(stream);
                 stream.Seek(0, SeekOrigin.Begin);
                 var reader = new System.IO.StreamReader(stream, Encoding.UTF7);
+                var delimiter = DetectDelimiter(reader);
                 using (var csv = new CsvReader(reader, CultureInfo.CurrentUICulture))
                 {
-                    csv.Configuration.Delimiter = ",";
+                    //csv.Configuration.Delimiter = ",";
+                    csv.Configuration.Delimiter = delimiter;
                     csv.Read();
                     csv.ReadHeader();
                     while (csv.Read())
@@ -150,6 +195,42 @@
                     }
                 }
             }
+        }
+    }
+
+    public static string DetectDelimiter(StreamReader reader)
+    {
+        var possibleDelimiters =  new List<string> {",",";","\t","|"};
+
+        var headerLine = reader.ReadLine();
+
+        reader.BaseStream.Position = 0;
+        reader.DiscardBufferedData();
+
+        foreach (var possibleDelimiter in possibleDelimiters)
+        {
+            if (headerLine.Contains(possibleDelimiter))
+            {
+                return possibleDelimiter;
+            }
+        }
+
+        return possibleDelimiters[0];
+    }
+
+    void SelectContent(IFileListEntry[] files)
+    {
+        contentSelected = true;
+        selectedFiles = files.ToList();
+    }
+
+    async Task LoadFile(IFileListEntry file, MouseEventArgs e)
+    {
+        file.OnDataRead += (sender, eventArgs) => InvokeAsync(StateHasChanged);
+
+        using (StreamContent streamContent = new StreamContent(file.Data))
+        {
+            await BlobStorageService.PutContentInBlobAsync(streamContent, file.Name);
         }
     }
 }

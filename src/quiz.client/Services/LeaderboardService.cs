@@ -14,7 +14,7 @@ namespace quiz.client
 {
     public class LeaderboardService : ILeaderboardService
     {
-         private readonly HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
 

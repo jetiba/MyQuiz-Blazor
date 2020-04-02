@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IBlobStorageService BlobStorageService
 
 <div class="container page-centered">
     <div class="row">
@@ -15,6 +16,22 @@
             <p><a href="/rules">Scopri come giocare</a></p>
         </div>  
     </div>
+
+    @if(!string.IsNullOrEmpty(sponsorText) || !string.IsNullOrEmpty(sponsorLogo))
+    {
+        <div class="row">
+            <div class="col">
+                Il quiz di questa settimana è sponsorizzato da:
+            </div>
+            <div class="col">
+                @sponsorText
+            </div>
+            <div class="col">
+                <img src="data:image/png;charset=utf-8;base64, @sponsorLogo" style="height: 100px" />
+            </div>
+        </div>
+    }
+    
     <AuthorizeView>
         <Authorized>
             <div class="row">
@@ -39,10 +56,19 @@
 
 @code
 {
+    string sponsorText = "";
+    string sponsorLogo = "";
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        
+        var sponsorDescription = await BlobStorageService.GetBlobAsync("testo.txt");
+        sponsorText = sponsorDescription != null ? System.Text.Encoding.UTF8.GetString(sponsorDescription) : "";
+
+        var sponsorLogoData = await BlobStorageService.GetBlobAsync("logo.png");
+        sponsorLogo = sponsorLogoData != null ? System.Convert.ToBase64String(sponsorLogoData) : "";
+
     }
 
     public void RedirectTo(MouseEventArgs e)

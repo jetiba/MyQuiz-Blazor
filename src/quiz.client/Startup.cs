@@ -17,6 +17,7 @@ namespace quiz.client
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ILeaderboardService, LeaderboardService>();
             services.AddScoped<IQuestionService, QuestionService>();
+            services.AddScoped<IBlobStorageService, BlobStorageService>();
             services.AddAuthorizationCore(options =>
             {
                 options.AddPolicy("RequireAdministratorRole",

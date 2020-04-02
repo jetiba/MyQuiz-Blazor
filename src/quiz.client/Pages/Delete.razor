@@ -1,6 +1,7 @@
 @page "/delete"
 
 @inject IQuestionService QuestionService
+@inject IBlobStorageService BlobStorageService
 
 <div class="container page-centered">
 
@@ -14,19 +15,32 @@
          <div class="row">
             <div class="col">
                 Al momento c'è un quiz attivo. Vuoi cancellare le domande per terminarlo? <br />
+                Cancellando le domande verranno cancellati anche i contenuti relativi agli sponsor <br /><br />
                 <button type="button" class="btn btn-success btn-lg btn-block" 
-                    @onclick="@(e => DeleteQuestions(e))">Elimina tutte le domande</button>
+                    @onclick="@(e => DeleteQuestions(e))">Elimina tutte le domande</button> <br /><br />
                 Torna alla pagina <a href="/administration">di gestione</a>
             </div>
         </div>
-        @if(deleted)
+        @if(deleteOp)
         {
-            <div class="row">
-                <div class="col rounded-borders">
-                    Le domande sono state eliminate, il quiz è terminato. <br />
-                    Torna alla pagina <a href="/upload">di caricamento</a> per caricare un nuovo quiz
-                </div>  
-            </div>
+            if(deleted)
+            {
+                <div class="row">
+                    <div class="col rounded-borders">
+                        Le domande sono state eliminate, il quiz è terminato. <br />
+                        Torna alla pagina <a href="/upload">di caricamento</a> per caricare un nuovo quiz
+                    </div>  
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col rounded-borders">
+                        Non ci sono domande da eliminare. <br />
+                        Torna alla pagina <a href="/upload">di caricamento</a> per caricare un nuovo quiz
+                    </div>  
+                </div>
+            }
         }       
     </Authorized>
    <NotAuthorized>
@@ -43,10 +57,12 @@
 @code 
 {
     bool deleted = false;
+    bool deleteOp = false;
 
     public async Task DeleteQuestions(MouseEventArgs e)
     {
         deleted = await QuestionService.DeleteAllQuestions();
+        await BlobStorageService.DeleteAllBlobsAsync();
+        deleteOp = true;
     }
-
 }
