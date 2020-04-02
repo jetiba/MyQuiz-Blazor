@@ -2,6 +2,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IQuestionService QuestionService
 @inject NavigationManager NavigationManager
+@inject IBlobStorageService BlobStorageService
 
 <div class="container page-centered">
 <AuthorizeView Roles="Admin">
@@ -15,6 +16,9 @@
             <div class="col">
                 <a class="btn btn-success btn-lg btn-block" href="upload" @onclick="@(e => CheckIfQuestionExist(e))" role="button">Carica nuove domande</a>
             </div>  
+            <div class="col">
+                <a class="btn btn-success btn-lg btn-block" href="sponsorupload" @onclick="@(e => CheckIfSponsorExist(e))" role="button">Gestisci sponsor</a>
+            </div>
             <div class="col">
                 <a class="btn btn-success btn-lg btn-block" href="delete" role="button">Termina il quiz</a>
             </div>
@@ -43,6 +47,20 @@
         else
         {
             NavigationManager.NavigateTo("/upload", true);
+        }
+    }
+
+    public async void CheckIfSponsorExist(MouseEventArgs e)
+    {
+        var sponsorDescription = await BlobStorageService.GetBlobAsync("testo.txt");
+        var sponsorLogoData = await BlobStorageService.GetBlobAsync("logo.png");
+
+        if(sponsorDescription == null || sponsorLogoData == null){
+            NavigationManager.NavigateTo("/sponsorupload", true);
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/delete", true);
         }
     }
 }

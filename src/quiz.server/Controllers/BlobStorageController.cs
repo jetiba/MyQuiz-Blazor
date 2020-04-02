@@ -22,10 +22,12 @@ namespace quiz.server.Controllers
     public class BlobStorageController : Controller
     {
         IConfiguration _configuration;
+        private TelemetryClient _telemetryClient;
 
-        public BlobStorageController(IConfiguration configuration)
+        public BlobStorageController(IConfiguration configuration, TelemetryClient telemetryClient)
         {
             _configuration = configuration;
+            _telemetryClient = telemetryClient;
         }
 
         [HttpGet("[action]")]
@@ -54,6 +56,11 @@ namespace quiz.server.Controllers
 
             await cc.UploadBlobAsync(filename, Request.Body);
 
+            _telemetryClient.TrackEvent("sponsorAddedInBlob",
+                                           new Dictionary<string, string>() { 
+                                               { "user", User.Identity.Name },
+                                               { "filename", filename }});
+
             return new OkResult();
         }
 
@@ -68,6 +75,10 @@ namespace quiz.server.Controllers
             {
                 await cc.DeleteBlobIfExistsAsync(b.Name);
             }
+
+            _telemetryClient.TrackEvent("sponsorDeleted",
+                                           new Dictionary<string, string>() { 
+                                               { "user", User.Identity.Name }});
 
             return new OkResult();
         }
