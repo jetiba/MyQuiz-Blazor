@@ -55,6 +55,7 @@ namespace quiz.server.Controllers
                 if(old == default)
                 {
                     await ldbcontext.Leaderboards.AddAsync(leaderboard);
+                    old = leaderboard;
                 }
                 else
                 {
