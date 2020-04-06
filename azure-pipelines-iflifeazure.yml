@@ -1,0 +1,58 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+
+steps:
+
+    - task: UseDotNet@2 
+      displayName: ".NET Core 3.1.x"
+      inputs:
+        version: '3.1.x'
+        packageType: sdk
+    - script: dotnet build $(System.DefaultWorkingDirectory)/src/quiz.server/quiz.server.csproj --configuration $(buildConfiguration)
+      displayName: 'dotnet build $(buildConfiguration)'
+
+    - task: Bash@3
+      displayName: "Install dotnet-ef"
+      inputs:
+        targetType: 'inline'
+        script: 'dotnet tool install --global dotnet-ef'
+
+    - task: Bash@3
+      displayName: "Create Migration script for ApplicationDbContext"
+      inputs:
+        targetType: 'inline'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/appscripts.sql -i -c ApplicationDbContext'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
+
+    - task: Bash@3
+      displayName: "Create Migration script for QuizDbContext"
+      inputs:
+        targetType: 'inline'
+        script: 'dotnet ef migrations script -o $(Build.ArtifactStagingDirectory)/migrations/quizscripts.sql -i -c QuizDbContext'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/src/quiz.server'
+
+    - task: DotNetCoreCLI@2
+      displayName: "Publish"
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        arguments: '$(System.DefaultWorkingDirectory)/src/quiz.server/quiz.server.csproj -r linux-x64 --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)/web'
+        zipAfterPublish: true
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Upload Artifacts"
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/web' 
+        artifactName: 'blazorartifact' 
+
+    - task: PublishBuildArtifacts@1
+      displayName: "Upload Migrations"
+      inputs:
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/migrations' 
+        artifactName: 'migrationdbcontext' 
