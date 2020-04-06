@@ -9,7 +9,7 @@
 
         @if(containsQuestions && task != 0 && !hasPlayed){
        
-                @if(task != listFoo.Count+1)
+                @if(task != listQuestions.Count+1)
                 {
                     <div class="row">
                         <div class="col rounded-borders">
@@ -25,30 +25,7 @@
                     <div class="row">
                         <div class="col rounded-borders-full">
                             Gioco completato!
-                        </div>
-                    </div>
-                        
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">Domanda</th>
-                                    <th scope="col">Risposta Corretta</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var qq in listFoo)
-                                {
-                                        <tr>
-                                            <td>@qq.QuestionText</td>
-                                            <td>@qq.Solution</td>
-                                        </tr>           
-                                }
-                            </tbody>
-                        </table>
-                    </div>      
-
-                    <div class="row">   
+                        </div>      
                         <div class="col rounded-borders">
                             Hai totalizzato @points punti
                         </div>
@@ -60,7 +37,7 @@
                 }
             
 
-            @if(task != listFoo.Count+1){
+            @if(task != listQuestions.Count+1){
                 
                     <div class="row">
                         <div class="col rounded-borders-full">
@@ -121,13 +98,10 @@
         }
 </div>
 @code {
-    [Parameter]
-    public RenderFragment TaskComponent { get; set; }
     int task = 0;
     int points = 0;
-    string question = ""; 
-    List<string> listQ;
-    List<Question> listFoo = new List<Question>();
+    string question = "";
+    List<Question> listQuestions = new List<Question>();
 
     bool disable = false;
 
@@ -155,9 +129,9 @@
             QuestionService.GetTimer(ref aTimer);
             aTimer.Elapsed += OnTimedEvent;
             
-            listFoo = await QuestionService.GetQuestions();
+            listQuestions = await QuestionService.GetQuestions();
 
-            containsQuestions = listFoo.Count != 0;
+            containsQuestions = listQuestions.Count != 0;
 
             if(containsQuestions)
             {
@@ -184,14 +158,14 @@
     void SetGame(){
 
         task = QuestionService.GetQuestionNumber();
-        if (task != listFoo.Count+1)
+        if (task != listQuestions.Count+1)
         {
-            question = listFoo[task-1].QuestionText;
-            solution = listFoo[task-1].Solution;
+            question = listQuestions[task-1].QuestionText;
+            solution = listQuestions[task-1].Solution;
             listA.Clear();
-            listA.Add(1, listFoo[task-1].Answer1);
-            listA.Add(2, listFoo[task-1].Answer2);
-            listA.Add(3, listFoo[task-1].Answer3);
+            listA.Add(1, listQuestions[task-1].Answer1);
+            listA.Add(2, listQuestions[task-1].Answer2);
+            listA.Add(3, listQuestions[task-1].Answer3);
         }
         result = "";
         disable = false;
@@ -204,10 +178,10 @@
         }
         if(QuestionService.GetTime() == 10)
         {
-            if(task < listFoo.Count+1){
+            if(task < listQuestions.Count+1){
                 SetGame();
             }     
-            if(task == listFoo.Count+1){
+            if(task == listQuestions.Count+1){
                 //update points in db
                 if(!username.Contains("admin")){
                     LeaderboardService.AddPoints(new Leaderboard(){
