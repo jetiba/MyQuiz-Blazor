@@ -37,8 +37,7 @@ namespace quiz.server.Controllers
             // {
             //     new Claim(ClaimTypes.Name, login.Email)
             // };
-            var user = login.Username.Contains('@') ? 
-                await _signInManager.UserManager.FindByEmailAsync(login.Username) : await _signInManager.UserManager.FindByNameAsync(login.Username) ;
+            var user = await _signInManager.UserManager.FindByNameAsync(login.Username);
         
             var roles = await _signInManager.UserManager.GetRolesAsync(user);
 

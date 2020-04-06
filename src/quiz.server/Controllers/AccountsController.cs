@@ -23,7 +23,7 @@ namespace quiz.server.Controllers
         public async Task<IActionResult> Post([FromBody]RegisterModel model)
         {
             if(!model.Username.Contains("admin")){
-                var newUser = new IdentityUser { UserName = model.Username, Email = model.Email };
+                var newUser = new IdentityUser { UserName = model.Username };
 
                 var result = await _userManager.CreateAsync(newUser, model.Password);
 

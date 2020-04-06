@@ -5,11 +5,6 @@ namespace quiz.shared
     public class RegisterModel
     {
         [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
-        [Required]
         [Display(Name = "Username")]
         public string Username { get; set; }
 
