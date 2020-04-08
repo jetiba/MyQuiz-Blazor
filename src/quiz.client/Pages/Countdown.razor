@@ -4,7 +4,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IQuestionService QuestionService
 
-
+<AuthorizeView>
+        <Authorized>
     <div class="container page-centered">
 
         @if(containsQuestions && task != 0 && !hasPlayed){
@@ -97,6 +98,22 @@
             </div>        
         }
 </div>
+</Authorized>
+        <NotAuthorized>
+            <div class="container page-centered">
+            <div class="row">
+                <div class="col">
+                    <h5>Il quiz è disponibile solo per gli utenti registrati</h5>
+                    <p>Accedi o registrati per iniziare a giocare</p>
+                    <a class="btn btn-success" href="login" role="button">Login</a>
+                    <a class="btn btn-success" href="register" role="button">Registrati</a>
+
+                </div>
+            </div>
+            </div>
+</NotAuthorized>
+    </AuthorizeView>
+
 @code {
     int task = 0;
     int points = 0;
@@ -122,22 +139,24 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         username = authState.User.Identity.Name;
 
-        var leaderboard = await LeaderboardService.GetAllPoints();
-        hasPlayed = leaderboard.Where(x => x.Username == username && x.HasPlayedLastGame).Any();
-        if(!hasPlayed)
+        if(!string.IsNullOrEmpty(username))
         {
-            QuestionService.GetTimer(ref aTimer);
-            aTimer.Elapsed += OnTimedEvent;
-            
-            listQuestions = await QuestionService.GetQuestions();
-
-            containsQuestions = listQuestions.Count != 0;
-
-            if(containsQuestions)
+            var leaderboard = await LeaderboardService.GetAllPoints();
+            hasPlayed = leaderboard.Where(x => x.Username == username && x.HasPlayedLastGame).Any();
+            if(!hasPlayed)
             {
-                QuestionService.StartTime();
+                QuestionService.GetTimer(ref aTimer);
+                aTimer.Elapsed += OnTimedEvent;
+                
+                listQuestions = await QuestionService.GetQuestions();
+
+                containsQuestions = listQuestions.Count != 0;
+
+                if(containsQuestions)
+                {
+                    QuestionService.StartTime();
+                }                
             }
-            
         }
     }
 
