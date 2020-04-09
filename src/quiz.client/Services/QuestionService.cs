@@ -87,7 +87,7 @@ namespace quiz.client
                 await Task.Delay(1000);
                 aTimer.Start();
                 
-                time = 10;
+                time = 12;
                 questionNumber++;
             }
         }

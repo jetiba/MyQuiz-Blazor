@@ -158,6 +158,7 @@ app {
         padding: 20px;
         margin-bottom: 20px;
         margin: 5px;
+        font-size: large;
 }
 
 .rounded-borders-timer {
