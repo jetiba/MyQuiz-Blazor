@@ -31,7 +31,7 @@ namespace quiz.server.Controllers
         {
             var result = await _signInManager.PasswordSignInAsync(login.Username, login.Password, false, false);
 
-            if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "Username and password are invalid." });
+            if (!result.Succeeded) return BadRequest(new LoginResult { Successful = false, Error = "L'utente non esiste o la password non è valida" });
 
             // var claims = new[]
             // {
