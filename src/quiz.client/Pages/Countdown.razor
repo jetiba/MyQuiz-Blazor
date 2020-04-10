@@ -142,7 +142,7 @@
         if(!string.IsNullOrEmpty(username))
         {
             var leaderboard = await LeaderboardService.GetAllPoints();
-            hasPlayed = leaderboard.Where(x => x.Username == username && x.HasPlayedLastGame).Any();
+            hasPlayed = leaderboard.Where(x => x.Username == username.ToLower() && x.HasPlayedLastGame).Any();
             if(!hasPlayed)
             {
                 QuestionService.GetTimer(ref aTimer);
