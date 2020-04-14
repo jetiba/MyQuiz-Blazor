@@ -15,7 +15,7 @@ namespace quiz.shared.Services
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
             aTimer.Elapsed += OnTimedEvent;
-            time = 12;
+            time = 15;
         }
 
         public Timer GetTimer()
@@ -31,7 +31,7 @@ namespace quiz.shared.Services
             }
             else
             {
-                time = 12;
+                time = 15;
             }
         }
 

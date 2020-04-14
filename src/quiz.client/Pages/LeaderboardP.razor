@@ -53,7 +53,7 @@
     int i = 0;
     List<Leaderboard> listUsers = new List<Leaderboard>();
 
-     protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {  
         listUsers = await LeaderboardService.GetAllPoints();
     }
